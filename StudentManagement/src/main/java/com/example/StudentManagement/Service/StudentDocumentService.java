@@ -1,9 +1,22 @@
 package com.example.StudentManagement.Service;
 
 
-import com.example.StudentManagement.Entity.StudentDocument;
+import com.example.StudentManagement.DTO.DocumentResponseDTO;
+
+import com.example.StudentManagement.enums.DocumentType;
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
+
 
 public interface StudentDocumentService {
 
-    StudentDocument saveDocument(StudentDocument document);
-}
+    public DocumentResponseDTO uploadDocument(
+            String studentId,
+            MultipartFile file,
+            DocumentType documentType,
+            String documentName
+    );
+    Resource viewDocument(Long documentId);
+
+    Resource downloadDocument(Long documentId);
+    }
