@@ -52,8 +52,52 @@ public class StudentDocumentServiceImpl
                     .orElseThrow(() ->
                             new RuntimeException("Student not found"));
 
+            boolean documentExists =
+                    studentDocumentRepository
+                            .findByStudentStudentIdAndDocumentType(
+                                    studentId,
+                                    documentType
+                            )
+                            .isPresent();
+
+            if (documentExists) {
+
+                throw new RuntimeException(
+                        documentType +
+                                " already uploaded. Use update API."
+                );
+            }
+
             // VALIDATE FILE
             String contentType = file.getContentType();
+            if (contentType == null) {
+                throw new RuntimeException(
+                        "Invalid file type"
+                );
+            }
+            // EMPTY FILE CHECK
+            if (file.isEmpty()) {
+                throw new RuntimeException(
+                        "File cannot be empty"
+                );
+            }
+
+// SIZE VALIDATION
+            if (documentType == DocumentType.PHOTO
+                    && file.getSize() > 2 * 1024 * 1024) {
+
+                throw new RuntimeException(
+                        "Photo size cannot exceed 2 MB"
+                );
+            }
+
+            if (documentType != DocumentType.PHOTO
+                    && file.getSize() > 10 * 1024 * 1024) {
+
+                throw new RuntimeException(
+                        "Document size cannot exceed 10 MB"
+                );
+            }
 
             if (documentType == DocumentType.PHOTO) {
 
@@ -67,10 +111,13 @@ public class StudentDocumentServiceImpl
 
             } else {
 
-                if (!contentType.equals("application/pdf")) {
+                if (!contentType.equals("application/pdf")
+                        && !contentType.equals(
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )) {
 
                     throw new RuntimeException(
-                            "Only PDF allowed for documents"
+                            "Only PDF or DOCX allowed"
                     );
                 }
             }
@@ -91,6 +138,13 @@ public class StudentDocumentServiceImpl
 
             // GENERATE UNIQUE FILE NAME
             String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null
+                    || !originalFileName.contains(".")) {
+
+                throw new RuntimeException(
+                        "Invalid file name"
+                );
+            }
 
             String extension = originalFileName.substring(
                     originalFileName.lastIndexOf(".")
@@ -233,5 +287,171 @@ public class StudentDocumentServiceImpl
             );
         }
     }
+
+
+    @Override
+    public DocumentResponseDTO updateDocument(
+            Long documentId,
+            MultipartFile file,
+            DocumentType documentType,
+            String documentName
+    ) {
+
+        try {
+
+            StudentDocument existingDocument =
+                    studentDocumentRepository.findById(documentId)
+                            .orElseThrow(() ->
+                                    new RuntimeException(
+                                            "Document not found"
+                                    ));
+
+            // DOCUMENT TYPE CANNOT BE CHANGED
+            if (existingDocument.getDocumentType() != documentType) {
+
+                throw new RuntimeException(
+                        "Document type cannot be changed. Use upload API for a new document."
+                );
+            }
+
+            String contentType = file.getContentType();
+
+            if (contentType == null) {
+                throw new RuntimeException(
+                        "Invalid file type"
+                );
+            }
+
+            if (file.isEmpty()) {
+                throw new RuntimeException(
+                        "File cannot be empty"
+                );
+            }
+
+            // SIZE VALIDATION
+            if (documentType == DocumentType.PHOTO
+                    && file.getSize() > 2 * 1024 * 1024) {
+
+                throw new RuntimeException(
+                        "Photo size cannot exceed 2 MB"
+                );
+            }
+
+            if (documentType != DocumentType.PHOTO
+                    && file.getSize() > 10 * 1024 * 1024) {
+
+                throw new RuntimeException(
+                        "Document size cannot exceed 10 MB"
+                );
+            }
+
+            // FILE TYPE VALIDATION
+            if (documentType == DocumentType.PHOTO) {
+
+                if (!contentType.equals("image/jpeg")
+                        && !contentType.equals("image/png")) {
+
+                    throw new RuntimeException(
+                            "PHOTO must be JPG or PNG"
+                    );
+                }
+
+            } else {
+
+                if (!contentType.equals("application/pdf")
+                        && !contentType.equals(
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )) {
+
+                    throw new RuntimeException(
+                            "Only PDF or DOCX allowed"
+                    );
+                }
+            }
+
+            // DELETE OLD FILE
+            Path oldFilePath =
+                    Paths.get(existingDocument.getFilePath());
+
+            Files.deleteIfExists(oldFilePath);
+
+            String folderName =
+                    documentType == DocumentType.PHOTO
+                            ? "photos"
+                            : "documents";
+
+            String studentId =
+                    existingDocument.getStudent()
+                            .getStudentId();
+
+            Path uploadPath = Paths.get(
+                    uploadDir,
+                    "students",
+                    studentId,
+                    folderName
+            );
+
+            Files.createDirectories(uploadPath);
+
+            String originalFileName =
+                    file.getOriginalFilename();
+
+            if (originalFileName == null
+                    || !originalFileName.contains(".")) {
+
+                throw new RuntimeException(
+                        "Invalid file name"
+                );
+            }
+
+            String extension =
+                    originalFileName.substring(
+                            originalFileName.lastIndexOf(".")
+                    );
+
+            String storedFileName =
+                    UUID.randomUUID() + extension;
+
+            Path filePath =
+                    uploadPath.resolve(storedFileName);
+
+            Files.copy(
+                    file.getInputStream(),
+                    filePath,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+
+            existingDocument.setDocumentName(documentName);
+            existingDocument.setOriginalFileName(originalFileName);
+            existingDocument.setStoredFileName(storedFileName);
+            existingDocument.setFilePath(filePath.toString());
+            existingDocument.setFileType(contentType);
+            existingDocument.setFileSize(file.getSize());
+
+            StudentDocument savedDocument =
+                    studentDocumentRepository.save(existingDocument);
+
+            return DocumentResponseDTO.builder()
+                    .documentId(savedDocument.getDocumentId())
+                    .studentId(savedDocument.getStudent().getStudentId())
+                    .documentName(savedDocument.getDocumentName())
+                    .documentType(savedDocument.getDocumentType())
+                    .originalFileName(savedDocument.getOriginalFileName())
+                    .storedFileName(savedDocument.getStoredFileName())
+                    .filePath(savedDocument.getFilePath())
+                    .fileType(savedDocument.getFileType())
+                    .fileSize(savedDocument.getFileSize())
+                    .uploadedAt(savedDocument.getUploadedAt())
+                    .build();
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Document update failed: "
+                            + e.getMessage()
+            );
+        }
+    }
+
 }
 

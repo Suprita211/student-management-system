@@ -79,4 +79,26 @@ public class StudentDocumentController {
                 )
                 .body(resource);
     }
+    @PutMapping("/documents/{documentId}")
+    public DocumentResponseDTO updateDocument(
+
+            @PathVariable Long documentId,
+
+            @RequestParam("file")
+            MultipartFile file,
+
+            @RequestParam("documentType")
+            DocumentType documentType,
+
+            @RequestParam("documentName")
+            String documentName
+    ) {
+
+        return studentDocumentService.updateDocument(
+                documentId,
+                file,
+                documentType,
+                documentName
+        );
+    }
 }

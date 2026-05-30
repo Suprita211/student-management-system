@@ -26,4 +26,5 @@ public interface StudentService {
             int page,
             int size
     );
+    byte[] generateStudentPdf(String studentId);
 }

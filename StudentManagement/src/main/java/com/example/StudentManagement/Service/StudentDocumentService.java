@@ -19,4 +19,12 @@ public interface StudentDocumentService {
     Resource viewDocument(Long documentId);
 
     Resource downloadDocument(Long documentId);
+
+    DocumentResponseDTO updateDocument(
+            Long documentId,
+            MultipartFile file,
+            DocumentType documentType,
+            String documentName
+    );
+
     }

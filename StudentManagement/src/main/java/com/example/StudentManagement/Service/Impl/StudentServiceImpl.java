@@ -6,11 +6,22 @@ import com.example.StudentManagement.DTO.StudentResponseDTO;
 import com.example.StudentManagement.DTO.StudentUpdateRequestDTO;
 import com.example.StudentManagement.Entity.PersonMaster;
 import com.example.StudentManagement.Entity.Student;
+import com.example.StudentManagement.Entity.StudentDocument;
 import com.example.StudentManagement.Repository.PersonMasterRepository;
+import com.example.StudentManagement.Repository.StudentDocumentRepository;
 import com.example.StudentManagement.Repository.StudentRepository;
 import com.example.StudentManagement.Service.StudentService;
+import com.example.StudentManagement.enums.DocumentType;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.List;
 
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -29,13 +40,27 @@ public class StudentServiceImpl implements StudentService {
 
     private final PersonMasterRepository personMasterRepository;
     private final StudentRepository studentRepository;
+    private final StudentDocumentRepository studentDocumentRepository;
 
     // CREATE STUDENT
 
+
+
+    @Transactional
     @Override
     public StudentResponseDTO createStudentAdmission(
             StudentCreateRequestDTO request
     ) {
+
+        // CHECK STUDENT ID ALREADY EXISTS
+
+        if (studentRepository.existsById(
+                request.getStudentId())) {
+
+            throw new RuntimeException(
+                    "Student ID already exists"
+            );
+        }
 
         // CHECK AADHAAR EXISTS OR NOT
 
@@ -46,11 +71,22 @@ public class StudentServiceImpl implements StudentService {
 
         PersonMaster person;
 
-        // IF PERSON EXISTS
-
         if (existingPerson.isPresent()) {
 
             person = existingPerson.get();
+
+            // PREVENT SAME COURSE ADMISSION
+
+            if (studentRepository
+                    .existsByPersonPersonIdAndCourseName(
+                            person.getPersonId(),
+                            request.getCourseName()
+                    )) {
+
+                throw new RuntimeException(
+                        "Student already enrolled in this course"
+                );
+            }
 
         } else {
 
@@ -251,5 +287,226 @@ public class StudentServiceImpl implements StudentService {
                 .session(student.getSession())
                 .duration(student.getDuration())
                 .build();
+    }
+
+    @Override
+    public byte[] generateStudentPdf(String studentId) {
+
+        try {
+
+            Student student = studentRepository.findById(studentId)
+                    .orElseThrow(() ->
+                            new RuntimeException("Student not found"));
+
+            PersonMaster person = student.getPerson();
+
+            List<StudentDocument> documents =
+                    studentDocumentRepository
+                            .findByStudentStudentId(studentId);
+
+            Optional<StudentDocument> photoDocument =
+                    studentDocumentRepository
+                            .findByStudentStudentIdAndDocumentType(
+                                    studentId,
+                                    DocumentType.PHOTO
+                            );
+
+            ByteArrayOutputStream outputStream =
+                    new ByteArrayOutputStream();
+
+            Document pdf = new Document(PageSize.A4);
+
+            PdfWriter.getInstance(pdf, outputStream);
+
+            pdf.open();
+
+            // LOGO
+            try {
+
+                InputStream logoStream =
+                        getClass()
+                                .getResourceAsStream(
+                                        "/static/images/NimttLogo.jpg"
+                                );
+
+                if (logoStream != null) {
+
+                    Image logo =
+                            Image.getInstance(
+                                    logoStream.readAllBytes()
+                            );
+
+                    logo.scaleToFit(80, 80);
+                    logo.setAlignment(Element.ALIGN_CENTER);
+
+                    pdf.add(logo);
+                }
+
+            } catch (Exception ignored) {
+            }
+
+            Paragraph heading =
+                    new Paragraph(
+                            "NIMTT STUDENT ADMISSION REPORT",
+                            FontFactory.getFont(
+                                    FontFactory.HELVETICA_BOLD,
+                                    16
+                            )
+                    );
+
+            heading.setAlignment(Element.ALIGN_CENTER);
+
+            pdf.add(heading);
+
+            pdf.add(new Paragraph(" "));
+
+            // PHOTO
+            if (photoDocument.isPresent()) {
+
+                try {
+
+                    Image studentPhoto =
+                            Image.getInstance(
+                                    photoDocument.get().getFilePath()
+                            );
+
+                    studentPhoto.scaleToFit(120, 120);
+                    studentPhoto.setAlignment(
+                            Element.ALIGN_CENTER
+                    );
+
+                    pdf.add(studentPhoto);
+
+                    pdf.add(new Paragraph(" "));
+
+                } catch (Exception ignored) {
+                }
+            }
+
+            // PERSONAL DETAILS TABLE
+
+            PdfPTable personalTable =
+                    new PdfPTable(2);
+
+            personalTable.setWidthPercentage(100);
+
+            personalTable.addCell("Student ID");
+            personalTable.addCell(student.getStudentId());
+
+            personalTable.addCell("Full Name");
+            personalTable.addCell(person.getFullName());
+
+            personalTable.addCell("Father Name");
+            personalTable.addCell(person.getFatherName());
+
+            personalTable.addCell("Mother Name");
+            personalTable.addCell(person.getMotherName());
+
+            personalTable.addCell("Aadhaar");
+            personalTable.addCell(person.getAadhaarNo());
+
+            personalTable.addCell("Primary Contact");
+            personalTable.addCell(person.getPrimaryContact());
+
+            personalTable.addCell("Email");
+            personalTable.addCell(person.getEmail());
+
+            pdf.add(personalTable);
+
+            pdf.add(new Paragraph(" "));
+
+            // COURSE DETAILS
+
+            PdfPTable courseTable =
+                    new PdfPTable(2);
+
+            courseTable.setWidthPercentage(100);
+
+            courseTable.addCell("Course Name");
+            courseTable.addCell(student.getCourseName());
+
+            courseTable.addCell("Course Type");
+            courseTable.addCell(student.getCourseType());
+
+            courseTable.addCell("University Reg No");
+            courseTable.addCell(
+                    student.getUniversityRegistrationNo()
+            );
+
+            courseTable.addCell("Admission Date");
+            courseTable.addCell(
+                    String.valueOf(
+                            student.getDateOfAdmission()
+                    )
+            );
+
+            courseTable.addCell("Counsellor");
+            courseTable.addCell(
+                    student.getCounsellorName()
+            );
+
+            courseTable.addCell("Session");
+            courseTable.addCell(student.getSession());
+
+            courseTable.addCell("Duration");
+            courseTable.addCell(student.getDuration());
+
+            pdf.add(courseTable);
+
+            pdf.add(new Paragraph(" "));
+
+            // DOCUMENTS TABLE
+
+            PdfPTable documentTable =
+                    new PdfPTable(3);
+
+            documentTable.setWidthPercentage(100);
+
+            documentTable.addCell("Document Type");
+            documentTable.addCell("Document Name");
+            documentTable.addCell("Uploaded At");
+
+            for (StudentDocument document : documents) {
+
+                documentTable.addCell(
+                        document.getDocumentType().name()
+                );
+
+                documentTable.addCell(
+                        document.getDocumentName()
+                );
+
+                documentTable.addCell(
+                        String.valueOf(
+                                document.getUploadedAt()
+                        )
+                );
+            }
+
+            pdf.add(documentTable);
+
+            pdf.add(new Paragraph(" "));
+
+            pdf.add(
+                    new Paragraph(
+                            "Generated On : "
+                                    + LocalDateTime.now()
+                    )
+            );
+
+            pdf.add(new Paragraph(" "));
+            pdf.add(new Paragraph("Admin Signature"));
+
+            pdf.close();
+
+            return outputStream.toByteArray();
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "PDF generation failed : "
+                            + e.getMessage()
+            );
+        }
     }
 }
