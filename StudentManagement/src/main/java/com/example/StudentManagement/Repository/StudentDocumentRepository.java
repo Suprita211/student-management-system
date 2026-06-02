@@ -18,4 +18,6 @@ public interface StudentDocumentRepository extends JpaRepository<StudentDocument
             String studentId,
             DocumentType documentType
     );
+
+
 }

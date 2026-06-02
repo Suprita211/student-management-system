@@ -2,6 +2,7 @@ package com.example.StudentManagement.Service;
 
 import com.example.StudentManagement.DTO.StudentCreateRequestDTO;
 import com.example.StudentManagement.DTO.StudentResponseDTO;
+import com.example.StudentManagement.DTO.StudentSearchResponseDTO;
 import com.example.StudentManagement.DTO.StudentUpdateRequestDTO;
 import com.example.StudentManagement.Entity.Student;
 import org.springframework.data.domain.Page;
@@ -27,4 +28,6 @@ public interface StudentService {
             int size
     );
     byte[] generateStudentPdf(String studentId);
+
+    StudentSearchResponseDTO searchByStudentId(String studentId);
 }

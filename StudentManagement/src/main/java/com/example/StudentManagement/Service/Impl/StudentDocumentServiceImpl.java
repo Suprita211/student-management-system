@@ -452,6 +452,33 @@ public class StudentDocumentServiceImpl
             );
         }
     }
+    @Override
+    public void deleteDocument(Long documentId) {
+
+        try {
+
+            StudentDocument document =
+                    studentDocumentRepository.findById(documentId)
+                            .orElseThrow(() ->
+                                    new RuntimeException(
+                                            "Document not found"
+                                    ));
+
+            Path filePath =
+                    Paths.get(document.getFilePath());
+
+            Files.deleteIfExists(filePath);
+
+            studentDocumentRepository.delete(document);
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Document delete failed: "
+                            + e.getMessage()
+            );
+        }
+    }
 
 }
 

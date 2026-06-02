@@ -2,6 +2,7 @@ package com.example.StudentManagement.Controller;
 
 import com.example.StudentManagement.DTO.StudentCreateRequestDTO;
 import com.example.StudentManagement.DTO.StudentResponseDTO;
+import com.example.StudentManagement.DTO.StudentSearchResponseDTO;
 import com.example.StudentManagement.DTO.StudentUpdateRequestDTO;
 import com.example.StudentManagement.Entity.Student;
 import com.example.StudentManagement.Service.StudentService;
@@ -85,5 +86,15 @@ public class StudentController {
                         MediaType.APPLICATION_PDF
                 )
                 .body(pdf);
+    }
+
+    @GetMapping("/search")
+    public StudentSearchResponseDTO searchStudent(
+            @RequestParam String studentId
+    ) {
+
+        return studentService.searchByStudentId(
+                studentId
+        );
     }
 }

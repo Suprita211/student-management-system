@@ -1,9 +1,7 @@
 package com.example.StudentManagement.Service.Impl;
 
 
-import com.example.StudentManagement.DTO.StudentCreateRequestDTO;
-import com.example.StudentManagement.DTO.StudentResponseDTO;
-import com.example.StudentManagement.DTO.StudentUpdateRequestDTO;
+import com.example.StudentManagement.DTO.*;
 import com.example.StudentManagement.Entity.PersonMaster;
 import com.example.StudentManagement.Entity.Student;
 import com.example.StudentManagement.Entity.StudentDocument;
@@ -508,5 +506,43 @@ public class StudentServiceImpl implements StudentService {
                             + e.getMessage()
             );
         }
+    }
+
+    @Override
+    public StudentSearchResponseDTO searchByStudentId(
+            String studentId
+    ) {
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() ->
+                        new RuntimeException("Student not found"));
+
+        List<DocumentResponseDTO> documents =
+                student.getDocuments()
+                        .stream()
+                        .map(doc -> DocumentResponseDTO.builder()
+                                .documentId(doc.getDocumentId())
+                                .studentId(student.getStudentId())
+                                .documentName(doc.getDocumentName())
+                                .documentType(doc.getDocumentType())
+                                .originalFileName(doc.getOriginalFileName())
+                                .storedFileName(doc.getStoredFileName())
+                                .filePath(doc.getFilePath())
+                                .fileType(doc.getFileType())
+                                .fileSize(doc.getFileSize())
+                                .uploadedAt(doc.getUploadedAt())
+                                .build())
+                        .toList();
+
+        return StudentSearchResponseDTO.builder()
+                .studentId(student.getStudentId())
+                .fullName(student.getPerson().getFullName())
+                .aadhaarNo(student.getPerson().getAadhaarNo())
+                .courseName(student.getCourseName())
+                .courseType(student.getCourseType())
+                .session(student.getSession())
+                .duration(student.getDuration())
+                .documents(documents)
+                .build();
     }
 }

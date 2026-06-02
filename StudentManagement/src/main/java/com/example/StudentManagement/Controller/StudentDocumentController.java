@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/students")
+@RequestMapping("/students/documents")
 @RequiredArgsConstructor
 public class StudentDocumentController {
 
     private final StudentDocumentService studentDocumentService;
 
     // UPLOAD DOCUMENT
-    @PostMapping("/{studentId}/documents")
+    @PostMapping("/{studentId}")
     public DocumentResponseDTO uploadDocument(
 
             @PathVariable String studentId,
@@ -45,7 +45,7 @@ public class StudentDocumentController {
     }
 
     // VIEW PDF
-    @GetMapping("/documents/{documentId}/view")
+    @GetMapping("/{documentId}/view")
     public ResponseEntity<Resource> viewDocument(
             @PathVariable Long documentId
     ) {
@@ -61,7 +61,7 @@ public class StudentDocumentController {
     }
 
     // DOWNLOAD PDF
-    @GetMapping("/documents/{documentId}/download")
+    @GetMapping("/{documentId}/download")
     public ResponseEntity<Resource> downloadDocument(
             @PathVariable Long documentId
     ) {
@@ -79,7 +79,7 @@ public class StudentDocumentController {
                 )
                 .body(resource);
     }
-    @PutMapping("/documents/{documentId}")
+    @PutMapping("/{documentId}")
     public DocumentResponseDTO updateDocument(
 
             @PathVariable Long documentId,
@@ -99,6 +99,20 @@ public class StudentDocumentController {
                 file,
                 documentType,
                 documentName
+        );
+    }
+
+    @DeleteMapping("/{documentId}")
+    public ResponseEntity<String> deleteDocument(
+            @PathVariable Long documentId
+    ) {
+
+        studentDocumentService.deleteDocument(
+                documentId
+        );
+
+        return ResponseEntity.ok(
+                "Document deleted successfully"
         );
     }
 }

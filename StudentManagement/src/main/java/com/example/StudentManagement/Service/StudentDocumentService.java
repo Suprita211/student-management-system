@@ -26,5 +26,6 @@ public interface StudentDocumentService {
             DocumentType documentType,
             String documentName
     );
+    void deleteDocument(Long documentId);
 
     }
