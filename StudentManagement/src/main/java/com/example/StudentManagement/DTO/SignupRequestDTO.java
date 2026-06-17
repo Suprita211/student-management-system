@@ -9,14 +9,10 @@ import lombok.Data;
 @Data
 public class SignupRequestDTO {
 
-
+    private String username;
 
     @Email
     private String email;
 
-    @NotBlank
     private String password;
-
-
-
 }

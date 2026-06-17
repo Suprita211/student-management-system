@@ -51,4 +51,5 @@ public class Student {
     // One Student -> Many Documents
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List<StudentDocument> documents;
+
 }

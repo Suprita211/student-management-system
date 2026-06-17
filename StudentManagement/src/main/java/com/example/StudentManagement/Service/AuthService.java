@@ -14,4 +14,16 @@ public interface AuthService {
     AuthResponseDTO login(
             LoginRequestDTO request
     );
+    public String forgotPassword(
+            String username
+    );
+
+    String resetPassword(
+            String username,
+            String newPassword
+    );
+    String verifyOtp(
+            String username,
+            String otp
+    );
 }

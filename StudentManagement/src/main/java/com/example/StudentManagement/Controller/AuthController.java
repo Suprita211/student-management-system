@@ -1,8 +1,6 @@
 package com.example.StudentManagement.Controller;
 
-import com.example.StudentManagement.DTO.AuthResponseDTO;
-import com.example.StudentManagement.DTO.LoginRequestDTO;
-import com.example.StudentManagement.DTO.SignupRequestDTO;
+import com.example.StudentManagement.DTO.*;
 import com.example.StudentManagement.Service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+   
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(
@@ -39,6 +38,43 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 authService.login(request)
+        );
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(
+            @RequestBody ForgotPasswordRequestDTO request
+    ) {
+
+        System.out.println("Forgot Password API Hit");
+
+        return ResponseEntity.ok(
+                authService.forgotPassword(
+                        request.getUsername()
+                )
+        );
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @RequestBody ResetPasswordRequestDTO request
+    ) {
+        return ResponseEntity.ok(
+                authService.resetPassword(
+                        request.getUsername(),
+                        request.getNewPassword()
+                )
+        );
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyOtp(
+            @RequestBody VerifyOtpRequestDTO request
+    ) {
+
+        return ResponseEntity.ok(
+                authService.verifyOtp(
+                        request.getUsername(),
+                        request.getOtp()
+                )
         );
     }
 }

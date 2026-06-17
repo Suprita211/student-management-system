@@ -4,6 +4,7 @@ import com.example.StudentManagement.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @Getter
@@ -17,6 +18,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String username;
 
     private String email;
 
@@ -24,4 +26,10 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    private String otp;
+
+    private LocalDateTime otpExpiryTime;
+
+    private boolean otpVerified;
 }
