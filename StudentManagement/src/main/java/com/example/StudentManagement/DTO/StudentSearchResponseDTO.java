@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,9 +20,31 @@ public class StudentSearchResponseDTO {
 
     private String aadhaarNo;
 
+    private String fatherName;
+
+    private String motherName;
+
+    private String primaryContact;
+
+    private String secondaryContact;
+
+    private String email;
+
+    private String presentAddress;
+
+    private String permanentAddress;
+
+    private LocalDate dateOfBirth;
+
     private String courseName;
 
     private String courseType;
+
+    private String universityRegistrationNo;
+
+    private LocalDate dateOfAdmission;
+
+    private String counsellorName;
 
     private String session;
 

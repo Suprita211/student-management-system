@@ -535,14 +535,45 @@ public class StudentServiceImpl implements StudentService {
                         .toList();
 
         return StudentSearchResponseDTO.builder()
+
                 .studentId(student.getStudentId())
+
                 .fullName(student.getPerson().getFullName())
                 .aadhaarNo(student.getPerson().getAadhaarNo())
+
+                .fatherName(student.getPerson().getFatherName())
+                .motherName(student.getPerson().getMotherName())
+
+                .primaryContact(student.getPerson().getPrimaryContact())
+                .secondaryContact(student.getPerson().getSecondaryContact())
+
+                .email(student.getPerson().getEmail())
+
+                .presentAddress(student.getPerson().getPresentAddress())
+                .permanentAddress(student.getPerson().getPermanentAddress())
+
+                .dateOfBirth(student.getPerson().getDateOfBirth())
+
                 .courseName(student.getCourseName())
                 .courseType(student.getCourseType())
+
+                .universityRegistrationNo(
+                        student.getUniversityRegistrationNo()
+                )
+
+                .dateOfAdmission(
+                        student.getDateOfAdmission()
+                )
+
+                .counsellorName(
+                        student.getCounsellorName()
+                )
+
                 .session(student.getSession())
                 .duration(student.getDuration())
+
                 .documents(documents)
+
                 .build();
     }
 }
