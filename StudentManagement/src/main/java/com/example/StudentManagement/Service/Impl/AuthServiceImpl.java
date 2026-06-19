@@ -54,32 +54,34 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponseDTO login(
-            LoginRequestDTO request
-    ) {
+    public AuthResponseDTO login(LoginRequestDTO request) {
+
+        System.out.println("LOGIN REQUEST USERNAME = " + request.getUsername());
 
         User user = userRepository
-                .findByUsername(
-                        request.getUsername()
-                )
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Invalid Username or Password"
-                        )
-                );
+                .findByUsername(request.getUsername())
+                .orElseThrow(() -> {
+                    System.out.println("USER NOT FOUND");
+                    return new RuntimeException("Invalid Username or Password");
+                });
 
-        if (!passwordEncoder.matches(
+        System.out.println("DB USERNAME = " + user.getUsername());
+        System.out.println("DB PASSWORD = " + user.getPassword());
+
+        boolean matches = passwordEncoder.matches(
                 request.getPassword(),
                 user.getPassword()
-        )) {
+        );
 
+        System.out.println("PASSWORD MATCHES = " + matches);
+
+        if (!matches) {
             throw new RuntimeException(
-                    "Invalid Email or Password"
+                    "Invalid Username or Password"
             );
         }
 
-        String token =
-                jwtService.generateToken(user);
+        String token = jwtService.generateToken(user);
 
         return AuthResponseDTO.builder()
                 .token(token)

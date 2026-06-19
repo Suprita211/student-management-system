@@ -3,6 +3,7 @@ package com.example.StudentManagement.DTO;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -48,4 +49,7 @@ public class StudentResponseDTO {
     private String session;
 
     private String duration;
+
+    // NEW
+    private List<DocumentResponseDTO> documents;
 }

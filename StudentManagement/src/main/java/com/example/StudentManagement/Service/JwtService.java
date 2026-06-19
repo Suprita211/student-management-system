@@ -1,12 +1,13 @@
 package com.example.StudentManagement.Service;
 
 import com.example.StudentManagement.Entity.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface JwtService {
 
     String generateToken(User user);
 
-    String extractEmail(String token);
+    public String extractUsername(String token);
 
-    boolean isTokenValid(String token);
+    boolean isTokenValid(String token, UserDetails userDetails);
 }

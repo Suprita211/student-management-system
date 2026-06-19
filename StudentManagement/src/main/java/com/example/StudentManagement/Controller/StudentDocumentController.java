@@ -51,15 +51,16 @@ public class StudentDocumentController {
     ) {
 
         Resource resource =
-                studentDocumentService.viewDocument(
-                        documentId
-                );
+                studentDocumentService.viewDocument(documentId);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=document.pdf"
+                )
                 .body(resource);
     }
-
     // DOWNLOAD PDF
     @GetMapping("/{documentId}/download")
     public ResponseEntity<Resource> downloadDocument(

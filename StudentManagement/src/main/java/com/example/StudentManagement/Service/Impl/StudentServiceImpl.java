@@ -262,6 +262,25 @@ public class StudentServiceImpl implements StudentService {
 
         PersonMaster person = student.getPerson();
 
+        List<DocumentResponseDTO> documents =
+                student.getDocuments()
+                        .stream()
+                        .map(doc ->
+                                DocumentResponseDTO.builder()
+                                        .documentId(doc.getDocumentId())
+                                        .studentId(student.getStudentId())
+                                        .documentName(doc.getDocumentName())
+                                        .documentType(doc.getDocumentType())
+                                        .originalFileName(doc.getOriginalFileName())
+                                        .storedFileName(doc.getStoredFileName())
+                                        .filePath(doc.getFilePath())
+                                        .fileType(doc.getFileType())
+                                        .fileSize(doc.getFileSize())
+                                        .uploadedAt(doc.getUploadedAt())
+                                        .build()
+                        )
+                        .toList();
+
         return StudentResponseDTO.builder()
                 .studentId(student.getStudentId())
                 .personId(person.getPersonId())
@@ -284,9 +303,12 @@ public class StudentServiceImpl implements StudentService {
                 .counsellorName(student.getCounsellorName())
                 .session(student.getSession())
                 .duration(student.getDuration())
+
+                // IMPORTANT
+                .documents(documents)
+
                 .build();
     }
-
     @Override
     public byte[] generateStudentPdf(String studentId) {
 
