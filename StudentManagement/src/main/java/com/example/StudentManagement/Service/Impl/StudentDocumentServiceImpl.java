@@ -215,12 +215,12 @@ public class StudentDocumentServiceImpl
                                     ));
 
             // PHOTO RESTRICTION
-            if (document.getDocumentType() == DocumentType.PHOTO) {
-
-                throw new RuntimeException(
-                        "Photos cannot be viewed"
-                );
-            }
+//            if (document.getDocumentType() == DocumentType.PHOTO) {
+//
+//                throw new RuntimeException(
+//                        "Photos cannot be viewed"
+//                );
+//            }
 
             Path path = Paths.get(document.getFilePath());
 
@@ -258,12 +258,12 @@ public class StudentDocumentServiceImpl
                                     ));
 
             // PHOTO RESTRICTION
-            if (document.getDocumentType() == DocumentType.PHOTO) {
-
-                throw new RuntimeException(
-                        "Photos cannot be downloaded"
-                );
-            }
+//            if (document.getDocumentType() == DocumentType.PHOTO) {
+//
+//                throw new RuntimeException(
+//                        "Photos cannot be downloaded"
+//                );
+//            }
 
             Path path = Paths.get(document.getFilePath());
 
@@ -451,6 +451,14 @@ public class StudentDocumentServiceImpl
                             + e.getMessage()
             );
         }
+    }
+
+    @Override
+    public StudentDocument getDocument(Long documentId) {
+
+        return studentDocumentRepository.findById(documentId)
+                .orElseThrow(() ->
+                        new RuntimeException("Document not found"));
     }
     @Override
     public void deleteDocument(Long documentId) {

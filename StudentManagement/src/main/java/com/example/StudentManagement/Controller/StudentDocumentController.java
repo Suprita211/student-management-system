@@ -1,6 +1,7 @@
 package com.example.StudentManagement.Controller;
 
 import com.example.StudentManagement.DTO.DocumentResponseDTO;
+import com.example.StudentManagement.Entity.StudentDocument;
 import com.example.StudentManagement.Service.StudentDocumentService;
 import com.example.StudentManagement.enums.DocumentType;
 
@@ -50,14 +51,28 @@ public class StudentDocumentController {
             @PathVariable Long documentId
     ) {
 
+        StudentDocument document =
+                studentDocumentService.getDocument(documentId);
+
         Resource resource =
                 studentDocumentService.viewDocument(documentId);
 
+        MediaType mediaType;
+
+        if (document.getFileType().equals("image/png")) {
+            mediaType = MediaType.IMAGE_PNG;
+        } else if (document.getFileType().equals("image/jpeg")) {
+            mediaType = MediaType.IMAGE_JPEG;
+        } else {
+            mediaType = MediaType.APPLICATION_PDF;
+        }
+
         return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
+                .contentType(mediaType)
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=document.pdf"
+                        "inline; filename=\"" +
+                                document.getOriginalFileName() + "\""
                 )
                 .body(resource);
     }
@@ -67,16 +82,28 @@ public class StudentDocumentController {
             @PathVariable Long documentId
     ) {
 
+        StudentDocument document =
+                studentDocumentService.getDocument(documentId);
+
         Resource resource =
-                studentDocumentService.downloadDocument(
-                        documentId
-                );
+                studentDocumentService.downloadDocument(documentId);
+
+        MediaType mediaType;
+
+        if (document.getFileType().equals("image/png")) {
+            mediaType = MediaType.IMAGE_PNG;
+        } else if (document.getFileType().equals("image/jpeg")) {
+            mediaType = MediaType.IMAGE_JPEG;
+        } else {
+            mediaType = MediaType.APPLICATION_PDF;
+        }
 
         return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
+                .contentType(mediaType)
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"document.pdf\""
+                        "attachment; filename=\"" +
+                                document.getOriginalFileName() + "\""
                 )
                 .body(resource);
     }

@@ -3,6 +3,7 @@ package com.example.StudentManagement.Service;
 
 import com.example.StudentManagement.DTO.DocumentResponseDTO;
 
+import com.example.StudentManagement.Entity.StudentDocument;
 import com.example.StudentManagement.enums.DocumentType;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,5 +28,7 @@ public interface StudentDocumentService {
             String documentName
     );
     void deleteDocument(Long documentId);
+    StudentDocument getDocument(Long documentId);
+    
 
     }
