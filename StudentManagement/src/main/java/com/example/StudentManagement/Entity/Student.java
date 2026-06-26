@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -50,6 +51,6 @@ public class Student {
 
     // One Student -> Many Documents
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private List<StudentDocument> documents;
+    private List<StudentDocument> documents = new ArrayList<>();
 
 }

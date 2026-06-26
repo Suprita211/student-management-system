@@ -67,7 +67,7 @@ public class SecurityConfig {
                         .hasAnyRole("USER","ADMIN")
 
                         .requestMatchers("/students/**")
-                        .hasAnyRole("USER", "ADMIN")
+                        .permitAll()
 
                         .anyRequest()
                         .authenticated()

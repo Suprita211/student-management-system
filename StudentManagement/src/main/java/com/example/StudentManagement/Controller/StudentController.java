@@ -24,12 +24,21 @@ public class StudentController {
 
     private final StudentService studentService;
 
+
+
     // CREATE
 
-    @PostMapping public StudentResponseDTO createAdmission(
-            @Valid @RequestBody StudentCreateRequestDTO request ) {
+    @PostMapping
+    public StudentResponseDTO createAdmission(
+            @Valid @RequestBody StudentCreateRequestDTO request
+    ) {
+
+        System.out.println("========== CONTROLLER HIT ==========");
+
         return studentService.createStudentAdmission(request);
     }
+
+
     // UPDATE
 
     @PutMapping("/{studentId}")

@@ -16,6 +16,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -263,7 +264,9 @@ public class StudentServiceImpl implements StudentService {
         PersonMaster person = student.getPerson();
 
         List<DocumentResponseDTO> documents =
-                student.getDocuments()
+                student.getDocuments() == null
+                        ? new ArrayList<>()
+                        : student.getDocuments()
                         .stream()
                         .map(doc ->
                                 DocumentResponseDTO.builder()
