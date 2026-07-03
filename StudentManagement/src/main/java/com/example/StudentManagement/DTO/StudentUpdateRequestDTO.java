@@ -18,6 +18,7 @@ public class StudentUpdateRequestDTO {
     private String fatherName;
 
     private String motherName;
+    private String universityName;
 
     private LocalDate dateOfBirth;
 

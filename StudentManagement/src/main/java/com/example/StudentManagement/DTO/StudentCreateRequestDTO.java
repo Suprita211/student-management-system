@@ -37,6 +37,7 @@ public class StudentCreateRequestDTO {
             message = "Mobile number must be 10 digits"
     )
     private String primaryContact;
+    private String universityName;
 
     private String secondaryContact;
 

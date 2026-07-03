@@ -36,6 +36,9 @@ public class Student {
     @Column(name = "university_registration_no")
     private String universityRegistrationNo;
 
+    @Column(name = "university_name")
+    private String universityName;
+
     @Column(name = "date_of_admission")
     private LocalDate dateOfAdmission;
 

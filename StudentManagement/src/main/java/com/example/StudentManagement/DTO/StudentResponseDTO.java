@@ -17,6 +17,7 @@ public class StudentResponseDTO {
     private Long personId;
 
     private String aadhaarNo;
+    private String universityName;
 
     private String fullName;
 

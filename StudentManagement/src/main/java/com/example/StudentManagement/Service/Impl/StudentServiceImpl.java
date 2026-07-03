@@ -115,6 +115,7 @@ public class StudentServiceImpl implements StudentService {
                 .person(person)
                 .courseName(request.getCourseName())
                 .courseType(request.getCourseType())
+                .universityName(request.getUniversityName())
                 .universityRegistrationNo(
                         request.getUniversityRegistrationNo()
                 )
@@ -192,6 +193,9 @@ public class StudentServiceImpl implements StudentService {
 
         if (request.getCourseType() != null) {
             student.setCourseType(request.getCourseType());
+        }
+        if (request.getUniversityName() != null) {
+            student.setUniversityName(request.getUniversityName());
         }
 
         if (request.getUniversityRegistrationNo() != null) {
@@ -299,6 +303,7 @@ public class StudentServiceImpl implements StudentService {
                 .permanentAddress(person.getPermanentAddress())
                 .courseName(student.getCourseName())
                 .courseType(student.getCourseType())
+                .universityName(student.getUniversityName())
                 .universityRegistrationNo(
                         student.getUniversityRegistrationNo()
                 )
@@ -451,6 +456,9 @@ public class StudentServiceImpl implements StudentService {
             courseTable.addCell("Course Type");
             courseTable.addCell(student.getCourseType());
 
+            courseTable.addCell("University Name");
+            courseTable.addCell(student.getUniversityName());
+
             courseTable.addCell("University Reg No");
             courseTable.addCell(
                     student.getUniversityRegistrationNo()
@@ -581,6 +589,7 @@ public class StudentServiceImpl implements StudentService {
 
                 .courseName(student.getCourseName())
                 .courseType(student.getCourseType())
+                .universityName(student.getUniversityName())
 
                 .universityRegistrationNo(
                         student.getUniversityRegistrationNo()

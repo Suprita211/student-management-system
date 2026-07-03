@@ -21,6 +21,7 @@ public class StudentSearchResponseDTO {
     private String aadhaarNo;
 
     private String fatherName;
+    private String universityName;
 
     private String motherName;
 
